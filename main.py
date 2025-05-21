@@ -28,37 +28,52 @@ main_data_set = main_data_set.set_index('FLT_DATE')
 # Aggregate by date, summing FLT_TOT_1
 time_series_data = main_data_set.groupby('FLT_DATE')['FLT_TOT_1'].sum().to_frame()
 
+# Apply non-seasonal differencing (d=1)
+differenced_series = time_series_data['FLT_TOT_1'].diff(periods=1).dropna()
+
+# Apply seasonal differencing (D=1, s=365)
+differenced_series = differenced_series.diff(periods=365).dropna()
+
 def main():
     
-    # Plot the time series data
+    # Plot the original time series data
     plt.figure(figsize=(12, 6))
     plt.plot(time_series_data)
-    plt.title('Total Daily Flights Over Time')
+    plt.title('Total Daily Flights Over Time (Original)')
     plt.xlabel('Date')
     plt.ylabel('Total Flights')
     plt.grid(True)
     plt.show()
 
-    # Perform Augmented Dickey-Fuller test
-    print("\nAugmented Dickey-Fuller Test:")
-    adf_test = adfuller(time_series_data['FLT_TOT_1'])
-    print(f'ADF Statistic: {adf_test[0]}')
-    print(f'p-value: {adf_test[1]}')
+    # Plot the differenced time series data
+    plt.figure(figsize=(12, 6))
+    plt.plot(differenced_series)
+    plt.title('Total Daily Flights Over Time (Differenced)')
+    plt.xlabel('Date')
+    plt.ylabel('Total Flights Differenced')
+    plt.grid(True)
+    plt.show()
+
+    # Perform Augmented Dickey-Fuller test on differenced series
+    print("\nAugmented Dickey-Fuller Test on Differenced Series:")
+    adf_test_diff = adfuller(differenced_series)
+    print(f'ADF Statistic: {adf_test_diff[0]}')
+    print(f'p-value: {adf_test_diff[1]}')
     print('Critical Values:')
-    for key, value in adf_test[4].items():
+    for key, value in adf_test_diff[4].items():
         print(f'   {key}: {value}')
 
-    print("\nOriginal DataFrame Head:")
-    print(main_data_set.head())
+    # print("\nOriginal DataFrame Head:")
+    # print(main_data_set.head())
 
-    print("\nOriginal DataFrame Info:")
-    print(main_data_set.info())
+    # print("\nOriginal DataFrame Info:")
+    # print(main_data_set.info())
 
-    print("\nTime Series Data Head:")
-    print(time_series_data.head())
+    # print("\nTime Series Data Head:")
+    # print(time_series_data.head())
 
-    print("\nTime Series Data Info:")
-    print(time_series_data.info())
+    # print("\nTime Series Data Info:")
+    # print(time_series_data.info())
 
 main()
 
