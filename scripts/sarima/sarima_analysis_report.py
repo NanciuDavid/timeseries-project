@@ -27,20 +27,23 @@ df['FLT_DATE'] = pd.to_datetime(df['FLT_DATE'], format='%d-%m-%y')
 df.set_index('FLT_DATE', inplace=True)
 time_series_data = df.groupby('FLT_DATE')['FLT_TOT_1'].sum().to_frame()
 
-y = time_series_data['FLT_TOT_1']
+# Remove pandemic period and concatenate pre- and post-pandemic
+y_pre = time_series_data.loc[:'2020-02-29']['FLT_TOT_1']
+y_post = time_series_data.loc['2021-07-01':]['FLT_TOT_1']
+y = pd.concat([y_pre, y_post])
 
 # 1. Data inspection and transformations
 plt.figure(figsize=(15, 12))
 plt.subplot(311)
 plt.plot(y.index, y, color='blue', linewidth=1.5)
-plt.title('(a) Air Traffic Time Series', fontsize=14)
+plt.title('(a) Air Traffic Time Series (No Pandemic)', fontsize=14)
 plt.xlabel('Date', fontsize=12)
 plt.ylabel('Total Flights', fontsize=12)
 plt.grid(True, linestyle='--', alpha=0.7)
 
 plt.subplot(312)
 plt.plot(y.index, np.log(y+1), color='green', linewidth=1.5)
-plt.title('(b) Log Transformation of Air Traffic', fontsize=14)
+plt.title('(b) Log Transformation of Air Traffic (No Pandemic)', fontsize=14)
 plt.xlabel('Date', fontsize=12)
 plt.ylabel('Log(Total Flights)', fontsize=12)
 plt.grid(True, linestyle='--', alpha=0.7)
@@ -48,13 +51,13 @@ plt.grid(True, linestyle='--', alpha=0.7)
 y_diff = y.diff()
 plt.subplot(313)
 plt.plot(y.index[1:], y_diff[1:], color='red', linewidth=1)
-plt.title('(c) First Difference of Air Traffic', fontsize=14)
+plt.title('(c) First Difference of Air Traffic (No Pandemic)', fontsize=14)
 plt.xlabel('Date', fontsize=12)
 plt.ylabel('Difference', fontsize=12)
 plt.grid(True, linestyle='--', alpha=0.7)
 
 plt.tight_layout()
-plt.savefig(plots_dir + 'figure1_transformations.png')
+plt.savefig(plots_dir + 'figure1_transformations_no_pandemic.png')
 plt.close()
 
 # 2. ADF tests and differencing

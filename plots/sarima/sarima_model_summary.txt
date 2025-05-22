@@ -1,0 +1,27 @@
+                                     SARIMAX Results                                     
+=========================================================================================
+Dep. Variable:                         FLT_TOT_1   No. Observations:                 2629
+Model:             SARIMAX(1, 1, 1)x(1, 0, 1, 7)   Log Likelihood              -22989.961
+Date:                           Thu, 22 May 2025   AIC                          45989.923
+Time:                                   04:01:12   BIC                          46019.276
+Sample:                               01-02-2016   HQIC                         46000.554
+                                    - 03-14-2023                                         
+Covariance Type:                             opg                                         
+==============================================================================
+                 coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+ar.L1         -0.0811      0.006    -14.432      0.000      -0.092      -0.070
+ma.L1         -1.0000      0.008   -120.302      0.000      -1.016      -0.984
+ar.S.L7        0.9819      0.004    279.046      0.000       0.975       0.989
+ma.S.L7       -0.5826      0.008    -71.669      0.000      -0.599      -0.567
+sigma2      2.438e+06   3.39e-09   7.19e+14      0.000    2.44e+06    2.44e+06
+===================================================================================
+Ljung-Box (L1) (Q):                   2.14   Jarque-Bera (JB):             55096.56
+Prob(Q):                              0.14   Prob(JB):                         0.00
+Heteroskedasticity (H):               0.81   Skew:                            -0.49
+Prob(H) (two-sided):                  0.00   Kurtosis:                        25.45
+===================================================================================
+
+Warnings:
+[1] Covariance matrix calculated using the outer product of gradients (complex-step).
+[2] Covariance matrix is singular or near-singular, with condition number 3.54e+28. Standard errors may be unstable.
