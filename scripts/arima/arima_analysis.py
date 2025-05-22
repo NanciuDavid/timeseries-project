@@ -128,7 +128,7 @@ if not is_stationary:
     # Check stationarity of the first difference
     print("\n--- Stationarity Test for First Difference ---")
     is_stationary_diff = adf_test(df_diff, title='First Difference')
-    
+
     # Update test results table for differenced series
     test_results_diff = pd.DataFrame({
         'Test': ['ADF Test', 'Phillips-Perron', 'KPSS Test'],
@@ -149,7 +149,7 @@ if not is_stationary:
         # Check stationarity of the second difference
         print("\n--- Stationarity Test for Second Difference ---")
         is_stationary_diff2 = adf_test(df_diff2, title='Second Difference')
-        
+
         if is_stationary_diff2:
             stationary_series = df_diff2
             d_order = 2
@@ -320,8 +320,8 @@ print(f"\nModel summary saved to '{plots_dir}arima_model_summary.txt'")
 
 # Create a visual representation of the model equation - similar to example PDF
 plt.figure(figsize=(10, 6))
-plt.text(0.5, 0.7, 
-         r"$ARIMA({0},{1},{2})$ model:".format(best_order[0], best_order[1], best_order[2]), 
+plt.text(0.5, 0.7,
+         r"$ARIMA({0},{1},{2})$ model:".format(best_order[0], best_order[1], best_order[2]),
          fontsize=16, ha='center')
 
 # Extract coefficients
@@ -371,13 +371,13 @@ for _, row in top_models.iterrows():
         model = ARIMA(train, order=(p, d, q))
         model_fit = model.fit()
         ll = model_fit.llf
-        
+
         table_data.append([f"ARIMA({p},{d},{q})", f"{row['AIC']:.2f}", f"{row['BIC']:.2f}", f"{ll:.2f}"])
     except:
         table_data.append([f"ARIMA({p},{d},{q})", f"{row['AIC']:.2f}", f"{row['BIC']:.2f}", "Error"])
 
 # Create the table
-table = plt.table(cellText=table_data, 
+table = plt.table(cellText=table_data,
                   colLabels=headers,
                   loc='center',
                   cellLoc='center',
@@ -393,7 +393,7 @@ for i, model_info in enumerate(table_data):
     if f"ARIMA({best_order_aic[0]},{best_order_aic[1]},{best_order_aic[2]})" in model_info[0]:
         # Highlight AIC column
         table[(i+1, 1)].set_facecolor('#CCFFCC')  # Light green
-        
+
     if f"ARIMA({best_order_bic[0]},{best_order_bic[1]},{best_order_bic[2]})" in model_info[0]:
         # Highlight BIC column
         table[(i+1, 2)].set_facecolor('#CCFFCC')  # Light green
@@ -429,11 +429,11 @@ plt.subplot(211)
 plt.text(0.5, 0.9, f"(a) Coefficients test for ARIMA{best_order_aic}", fontsize=14, ha='center', transform=plt.gca().transAxes)
 
 # Create the table for AIC model
-cell_text = [[f"{row['Parameter']}", f"{row['Coefficient']:.4f}", f"{row['Std Error']:.4f}", 
+cell_text = [[f"{row['Parameter']}", f"{row['Coefficient']:.4f}", f"{row['Std Error']:.4f}",
               f"{row['z-value']:.4f}", f"{row['p-value']:.4f}"] for _, row in aic_model_coefs.iterrows()]
 column_labels = ['Parameter', 'Coefficient', 'Std Error', 'z-value', 'p-value']
 
-aic_table = plt.table(cellText=cell_text, colLabels=column_labels, loc='center', 
+aic_table = plt.table(cellText=cell_text, colLabels=column_labels, loc='center',
                       cellLoc='center', colColours=['#f2f2f2']*5)
 aic_table.auto_set_font_size(False)
 aic_table.set_fontsize(10)
@@ -454,7 +454,7 @@ diag_table_data = [
     ['Jarque-Bera', f"{jb_test[0]:.4f}", f"{jb_test[1]:.8f}", 'Reject H0' if jb_test[1] < 0.05 else 'Fail to reject H0']
 ]
 
-diag_table = plt.table(cellText=diag_table_data[1:], colLabels=diag_table_data[0], 
+diag_table = plt.table(cellText=diag_table_data[1:], colLabels=diag_table_data[0],
                        loc='center', cellLoc='center', colColours=['#f2f2f2']*4)
 diag_table.auto_set_font_size(False)
 diag_table.set_fontsize(10)
@@ -468,90 +468,209 @@ plt.close()
 print(f"\nCoefficient tests saved to '{plots_dir}coefficient_tests.png'")
 
 # Plot residuals (similar to Fig 3)
-fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+plt.figure(figsize=(15, 10))
 
-# Time plot of residuals
-axes[0, 0].plot(residuals.index, residuals, color='blue')
-axes[0, 0].set_title('(a) Time Plot of Residuals', fontsize=14)
-axes[0, 0].set_xlabel('Date', fontsize=12)
-axes[0, 0].set_ylabel('Residual Value', fontsize=12)
-axes[0, 0].grid(True, linestyle='--', alpha=0.7)
+# Residuals for best AIC model
+residuals = best_model.resid
 
-# Histogram of residuals
-axes[0, 1].hist(residuals, bins=30, density=True, color='blue', alpha=0.7)
-xmin, xmax = axes[0, 1].get_xlim()
-x = np.linspace(xmin, xmax, 100)
-axes[0, 1].plot(x, np.exp(-(x**2)/2)/(np.sqrt(2*np.pi)), 'r', linewidth=2)
-axes[0, 1].set_title('(b) Histogram of Residuals with Normal Curve', fontsize=14)
-axes[0, 1].set_xlabel('Residual Value', fontsize=12)
-axes[0, 1].set_ylabel('Density', fontsize=12)
-axes[0, 1].grid(True, linestyle='--', alpha=0.7)
+# Create Model 1 subplot
+plt.subplot(211)
+plt.plot(residuals.index, residuals, color='blue')
+plt.title(f'(a) Residuals of ARIMA{best_order_aic} (Best AIC)', fontsize=14)
+plt.xlabel('Date', fontsize=12)
+plt.ylabel('Residual Value', fontsize=12)
+plt.grid(True, linestyle='--', alpha=0.7)
 
-# ACF of residuals
-plot_acf(residuals, ax=axes[1, 0], lags=40, alpha=0.05)
-axes[1, 0].set_title('(c) ACF of Residuals', fontsize=14)
-axes[1, 0].grid(True, linestyle='--', alpha=0.7)
+# Residuals for best BIC model
+bic_residuals = bic_model.resid
 
-# QQ plot of residuals
-stats.probplot(residuals, dist="norm", plot=axes[1, 1])
-axes[1, 1].set_title('(d) Q-Q Plot of Residuals', fontsize=14)
-axes[1, 1].grid(True, linestyle='--', alpha=0.7)
+# Create Model 2 subplot
+plt.subplot(212)
+plt.plot(bic_residuals.index, bic_residuals, color='red')
+plt.title(f'(b) Residuals of ARIMA{best_order_bic} (Best BIC)', fontsize=14)
+plt.xlabel('Date', fontsize=12)
+plt.ylabel('Residual Value', fontsize=12)
+plt.grid(True, linestyle='--', alpha=0.7)
 
 plt.tight_layout()
-plt.savefig(plots_dir + 'figure3_residual_diagnostics.png')
+plt.savefig(plots_dir + 'figure3_residual_comparison.png')
 plt.close()
 
-print(f"\nResidual diagnostics plots saved to '{plots_dir}figure3_residual_diagnostics.png'")
+print(f"\nResidual comparison plot saved to '{plots_dir}figure3_residual_comparison.png'")
 
-# Forecasting - Similar to Figures 8-9 in example PDF
-print("\n--- Forecasting ---")
+# Figure 4: ACF of Residuals Comparison
+plt.figure(figsize=(15, 10))
 
-# Forecast on test set
+# ACF of AIC model residuals
+plt.subplot(211)
+plot_acf(residuals, ax=plt.gca(), lags=40, alpha=0.05)
+plt.title(f'(a) ACF of Residuals - ARIMA{best_order_aic}', fontsize=14)
+plt.grid(True, linestyle='--', alpha=0.7)
+
+# ACF of BIC model residuals
+plt.subplot(212)
+plot_acf(bic_residuals, ax=plt.gca(), lags=40, alpha=0.05)
+plt.title(f'(b) ACF of Residuals - ARIMA{best_order_bic}', fontsize=14)
+plt.grid(True, linestyle='--', alpha=0.7)
+
+plt.tight_layout()
+plt.savefig(plots_dir + 'figure4_acf_residuals_comparison.png')
+plt.close()
+
+print(f"\nACF of residuals comparison saved to '{plots_dir}figure4_acf_residuals_comparison.png'")
+
+# Figure 5: Histogram of Residuals Comparison
+plt.figure(figsize=(15, 10))
+
+# Histogram of AIC model residuals
+plt.subplot(211)
+plt.hist(residuals, bins=30, density=True, color='blue', alpha=0.7)
+xmin, xmax = plt.gca().get_xlim()
+x = np.linspace(xmin, xmax, 100)
+plt.plot(x, np.exp(-(x**2)/2)/(np.sqrt(2*np.pi)), 'r', linewidth=2)
+plt.title(f'(a) Histogram of Residuals with Normal Curve - ARIMA{best_order_aic}', fontsize=14)
+plt.xlabel('Residual Value', fontsize=12)
+plt.ylabel('Density', fontsize=12)
+plt.grid(True, linestyle='--', alpha=0.7)
+
+# Histogram of BIC model residuals
+plt.subplot(212)
+plt.hist(bic_residuals, bins=30, density=True, color='red', alpha=0.7)
+xmin, xmax = plt.gca().get_xlim()
+x = np.linspace(xmin, xmax, 100)
+plt.plot(x, np.exp(-(x**2)/2)/(np.sqrt(2*np.pi)), 'b', linewidth=2)
+plt.title(f'(b) Histogram of Residuals with Normal Curve - ARIMA{best_order_bic}', fontsize=14)
+plt.xlabel('Residual Value', fontsize=12)
+plt.ylabel('Density', fontsize=12)
+plt.grid(True, linestyle='--', alpha=0.7)
+
+plt.tight_layout()
+plt.savefig(plots_dir + 'figure5_histogram_residuals_comparison.png')
+plt.close()
+
+print(f"\nHistogram of residuals comparison saved to '{plots_dir}figure5_histogram_residuals_comparison.png'")
+
+# Figure 6: Q-Q Plot of Residuals Comparison
+plt.figure(figsize=(15, 10))
+
+# Q-Q plot of AIC model residuals
+plt.subplot(211)
+stats.probplot(residuals, dist="norm", plot=plt.gca())
+plt.title(f'(a) Q-Q Plot of Residuals - ARIMA{best_order_aic}', fontsize=14)
+plt.grid(True, linestyle='--', alpha=0.7)
+
+# Q-Q plot of BIC model residuals
+plt.subplot(212)
+stats.probplot(bic_residuals, dist="norm", plot=plt.gca())
+plt.title(f'(b) Q-Q Plot of Residuals - ARIMA{best_order_bic}', fontsize=14)
+plt.grid(True, linestyle='--', alpha=0.7)
+
+plt.tight_layout()
+plt.savefig(plots_dir + 'figure6_qq_residuals_comparison.png')
+plt.close()
+
+print(f"\nQ-Q plot of residuals comparison saved to '{plots_dir}figure6_qq_residuals_comparison.png'")
+
+# Figure 7: Fitted vs Actual Values Comparison
+plt.figure(figsize=(15, 10))
+
+# Fitted vs Actual for AIC model
+plt.subplot(211)
+fitted_values_aic = best_model.fittedvalues
+plt.plot(train.index, train, label='Actual', color='blue')
+plt.plot(fitted_values_aic.index, fitted_values_aic, label='Fitted', color='green')
+plt.title(f'(a) Fitted vs Actual Values - ARIMA{best_order_aic}', fontsize=14)
+plt.xlabel('Date', fontsize=12)
+plt.ylabel('Price Difference', fontsize=12)
+plt.legend(loc='best')
+plt.grid(True, linestyle='--', alpha=0.7)
+
+# Fitted vs Actual for BIC model
+plt.subplot(212)
+fitted_values_bic = bic_model.fittedvalues
+plt.plot(train.index, train, label='Actual', color='blue')
+plt.plot(fitted_values_bic.index, fitted_values_bic, label='Fitted', color='red')
+plt.title(f'(b) Fitted vs Actual Values - ARIMA{best_order_bic}', fontsize=14)
+plt.xlabel('Date', fontsize=12)
+plt.ylabel('Price Difference', fontsize=12)
+plt.legend(loc='best')
+plt.grid(True, linestyle='--', alpha=0.7)
+
+plt.tight_layout()
+plt.savefig(plots_dir + 'figure7_fitted_actual_comparison.png')
+plt.close()
+
+print(f"\nFitted vs actual values comparison saved to '{plots_dir}figure7_fitted_actual_comparison.png'")
+
+# Modified Figure 8: Point Forecast Comparison
+plt.figure(figsize=(15, 10))
+
+# Forecast for AIC model
 forecast_steps = len(test)
 forecast = best_model.get_forecast(steps=forecast_steps)
 forecast_mean = forecast.predicted_mean
 forecast_ci = forecast.conf_int()
 
-# Create a plot similar to Figure 8 in example PDF
-plt.figure(figsize=(15, 7))
+# AIC model forecast
+plt.subplot(211)
 plt.plot(forecast_mean.index, forecast_mean, 'r-', label='Point Forecast')
-plt.fill_between(forecast_mean.index, 
-                 forecast_ci.iloc[:, 0], 
-                 forecast_ci.iloc[:, 1], 
-                 color='pink', alpha=0.3)
+plt.fill_between(forecast_mean.index, forecast_ci.iloc[:, 0], forecast_ci.iloc[:, 1], color='pink', alpha=0.3)
 plt.plot(test.index, test, 'b-', label='Actual Values')
-
-plt.title('Gold Price Forecast (Differenced Series)', fontsize=16)
-plt.xlabel('Date', fontsize=14)
-plt.ylabel('Price Difference', fontsize=14)
+plt.title(f'(a) Gold Price Forecast - ARIMA{best_order_aic} (Best AIC)', fontsize=14)
+plt.xlabel('Date', fontsize=12)
+plt.ylabel('Price Difference', fontsize=12)
 plt.legend(loc='best')
 plt.grid(True, linestyle='--', alpha=0.7)
 
-# Add error metrics as a table in the plot
-mse = mean_squared_error(test, forecast_mean)
-rmse = np.sqrt(mse)
-try:
-    mape = np.mean(np.abs((test.values - forecast_mean.values) / test.values)) * 100
-except:
-    mape = float('nan')
+# Calculate metrics for AIC model
+mse_aic = mean_squared_error(test, forecast_mean)
+rmse_aic = np.sqrt(mse_aic)
+mape_aic = np.mean(np.abs((test.values - forecast_mean.values) / test.values)) * 100 if not np.isnan(np.mean(np.abs((test.values - forecast_mean.values) / test.values))) else float('nan')
 
-error_text = f"MSE: {mse:.2f}\nRMSE: {rmse:.2f}\nMAPE: {mape:.2f}%"
-plt.text(0.02, 0.96, "Error Metrics:", transform=plt.gca().transAxes, fontsize=12, 
+error_text_aic = f"MSE: {mse_aic:.2f}\nRMSE: {rmse_aic:.2f}\nMAPE: {mape_aic:.2f}%"
+plt.text(0.02, 0.95, "Error Metrics:", transform=plt.gca().transAxes, fontsize=12,
          verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
-plt.text(0.02, 0.90, error_text, transform=plt.gca().transAxes, fontsize=10, 
+plt.text(0.02, 0.87, error_text_aic, transform=plt.gca().transAxes, fontsize=10,
+         verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+
+# Forecast for BIC model
+bic_forecast = bic_model.get_forecast(steps=forecast_steps)
+bic_forecast_mean = bic_forecast.predicted_mean
+bic_forecast_ci = bic_forecast.conf_int()
+
+# BIC model forecast
+plt.subplot(212)
+plt.plot(bic_forecast_mean.index, bic_forecast_mean, 'g-', label='Point Forecast')
+plt.fill_between(bic_forecast_mean.index, bic_forecast_ci.iloc[:, 0], bic_forecast_ci.iloc[:, 1], color='lightgreen', alpha=0.3)
+plt.plot(test.index, test, 'b-', label='Actual Values')
+plt.title(f'(b) Gold Price Forecast - ARIMA{best_order_bic} (Best BIC)', fontsize=14)
+plt.xlabel('Date', fontsize=12)
+plt.ylabel('Price Difference', fontsize=12)
+plt.legend(loc='best')
+plt.grid(True, linestyle='--', alpha=0.7)
+
+# Calculate metrics for BIC model
+mse_bic = mean_squared_error(test, bic_forecast_mean)
+rmse_bic = np.sqrt(mse_bic)
+mape_bic = np.mean(np.abs((test.values - bic_forecast_mean.values) / test.values)) * 100 if not np.isnan(np.mean(np.abs((test.values - bic_forecast_mean.values) / test.values))) else float('nan')
+
+error_text_bic = f"MSE: {mse_bic:.2f}\nRMSE: {rmse_bic:.2f}\nMAPE: {mape_bic:.2f}%"
+plt.text(0.02, 0.95, "Error Metrics:", transform=plt.gca().transAxes, fontsize=12,
+         verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+plt.text(0.02, 0.87, error_text_bic, transform=plt.gca().transAxes, fontsize=10,
          verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
 
 plt.tight_layout()
-plt.savefig(plots_dir + 'figure8_point_forecast.png')
+plt.savefig(plots_dir + 'figure8_forecast_comparison.png')
 plt.close()
 
-print(f"\nForecast plot saved to '{plots_dir}figure8_point_forecast.png'")
+print(f"\nForecast comparison plot saved to '{plots_dir}figure8_forecast_comparison.png'")
 
 # Evaluate forecast accuracy
 print("\nForecast Accuracy Metrics:")
-print(f"Mean Squared Error (MSE): {mse:.4f}")
-print(f"Root Mean Squared Error (RMSE): {rmse:.4f}")
-print(f"Mean Absolute Percentage Error (MAPE): {mape:.2f}%")
+print(f"Mean Squared Error (MSE): {mse_aic:.4f}")
+print(f"Root Mean Squared Error (RMSE): {rmse_aic:.4f}")
+print(f"Mean Absolute Percentage Error (MAPE): {mape_aic:.2f}%")
 
 # If the series was differenced, we need to convert the forecasts back to the original scale
 if d_order > 0:
@@ -628,9 +747,9 @@ if d_order > 0:
     plt.subplot(211)
     plt.plot(test.index, df['VALUE'].loc[test.index], label='Actual', color='blue')
     plt.plot(original_forecast_df.index, original_forecast_df['Forecast'], label='Forecast', color='red')
-    plt.fill_between(original_forecast_df.index, 
-                    original_forecast_df['Lower CI'], 
-                    original_forecast_df['Upper CI'], 
+    plt.fill_between(original_forecast_df.index,
+                    original_forecast_df['Lower CI'],
+                    original_forecast_df['Upper CI'],
                     color='pink', alpha=0.3, label='95% CI')
     plt.title('(a) Gold Price Forecast vs Actual (Original Scale)', fontsize=14)
     plt.xlabel('Date', fontsize=12)
@@ -670,21 +789,21 @@ if d_order > 0:
 
     # Calculate Theil's U statistic (as shown in Figure 10 of example PDF)
     from sklearn.metrics import mean_squared_error
-    
+
     # Calculate naive forecast (using previous value as forecast)
     naive_forecast = df['VALUE'].iloc[train_size-1:-1].values
-    
+
     # Calculate MSE for naive forecast
     naive_mse = mean_squared_error(actual_values, naive_forecast[:len(actual_values)])
-    
+
     # Theil's U statistic
     theil_u = np.sqrt(original_mse) / np.sqrt(naive_mse)
-    
+
     # Create Figure 10 - Theil's U visualization
     plt.figure(figsize=(8, 6))
     plt.text(0.5, 0.8, "Theil's U Statistic", fontsize=16, ha='center')
     plt.text(0.5, 0.6, f"U = {theil_u:.4f}", fontsize=14, ha='center')
-    
+
     # Add interpretation
     if theil_u < 1:
         interpretation = f"U < 1: The forecast is better than a naive guess\n({theil_u:.2f} < 1)"
@@ -692,15 +811,15 @@ if d_order > 0:
         interpretation = f"U = 1: The forecast is equal to a naive guess\n({theil_u:.2f} = 1)"
     else:
         interpretation = f"U > 1: The forecast is worse than a naive guess\n({theil_u:.2f} > 1)"
-    
+
     plt.text(0.5, 0.4, interpretation, fontsize=12, ha='center')
-    
+
     plt.axis('off')
     plt.tight_layout()
     plt.savefig(plots_dir + 'figure10_theil_u.png')
     plt.close()
-    
+
     print(f"\nTheil's U statistic plot saved to '{plots_dir}figure10_theil_u.png'")
     print(f"Theil's U value: {theil_u:.4f}")
-    
+
 print("\nARIMA analysis complete!")
