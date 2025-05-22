@@ -1,12 +1,12 @@
-                               SARIMAX Results                                
+                               SARIMAX Results
 ==============================================================================
 Dep. Variable:             first_diff   No. Observations:                 4420
 Model:                 ARIMA(2, 1, 2)   Log Likelihood              -16261.145
 Date:                Thu, 22 May 2025   AIC                          32532.290
 Time:                        10:41:57   BIC                          32564.258
 Sample:                             0   HQIC                         32543.564
-                               - 4420                                         
-Covariance Type:                  opg                                         
+                               - 4420
+Covariance Type:                  opg
 ==============================================================================
                  coef    std err          z      P>|z|      [0.025      0.975]
 ------------------------------------------------------------------------------
